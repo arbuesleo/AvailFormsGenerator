@@ -1,6 +1,7 @@
 package com.avail.availForms;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,11 @@ import com.avail.availForms.pojo.ListagemPojo;
 
 public class CreateForms {
 
+	private static int levelClazz = 0;
+
 	public static FormPojo getDadosForm(Class<?> clazz) throws Exception {
+
+		levelClazz = 0;
 
 		if (!clazz.isAnnotationPresent(Form.class)) {
 			throw new Exception("Anotação Form não está presente na entidade.");
@@ -33,29 +38,44 @@ public class CreateForms {
 		List<EntidadePojo> entidades = new ArrayList<EntidadePojo>();
 
 		entidades.add(new EntidadePojo(clazz.getAnnotation(Form.class).nomeEntidade(), new ArrayList<CampoPojo>(),
-				TipoEntidade.PRINCIPAL, true));
+				TipoEntidade.PRINCIPAL, true, clazz.getName()));
 
-		entidades.get(0).setCampos(getCampos(clazz, entidades));
+		entidades.get(0).setCampos(getCampos(clazz, entidades, levelClazz));
 
 		return new FormPojo(clazz.getAnnotation(Form.class).orientacao().toString(), entidades);
 	}
 
-	private static List<CampoPojo> getCampos(Class<?> clazz, List<EntidadePojo> entidades) throws Exception {
+	private static List<CampoPojo> getCampos(Class<?> clazz, List<EntidadePojo> entidades, int levelClazz)
+			throws Exception {
 		List<CampoPojo> campos = new ArrayList<CampoPojo>();
-		for (Field campo : clazz.getFields()) {
-			if (campo.isAnnotationPresent(CampoForm.class) && containsAnotationsRelacionamento(campo)) {
-				throw new Exception(
-						"Um campo não pode conter a anotação @CampoForm e ao mesmo tempo ser um relacionamento.");
-			}
-			if (campo.isAnnotationPresent(CampoForm.class)) {
-				CampoForm campoForm = campo.getAnnotation(CampoForm.class);
-				campos.add(new CampoPojo(campoForm.label(), isRequerido(campo), campo.getName(), getOpcoes(campo),
-						campoForm.tipo().name(), getTamanho(campo), campoForm.editavel(), campoForm.pesquisavel()));
-			} else if (containsAnotationsRelacionamento(campo)) {
-				if (campo.getClass().isAnnotationPresent(Form.class)) {
-					List<CampoPojo> camposEntidadeFilha = getCampos(campo.getClass(), entidades);
-					entidades.add(new EntidadePojo(campo.getClass().getAnnotation(Form.class).nomeEntidade(),
-							camposEntidadeFilha, getTipoEntidade(campo), true));
+		if (levelClazz < 2) {
+			for (Field campo : clazz.getDeclaredFields()) {
+				if (campo.isAnnotationPresent(CampoForm.class) && containsAnotationsRelacionamento(campo)) {
+					throw new Exception(
+							"Um campo não pode conter a anotação @CampoForm e ao mesmo tempo ser um relacionamento.");
+				}
+				if (campo.isAnnotationPresent(CampoForm.class)) {
+					CampoForm campoForm = campo.getAnnotation(CampoForm.class);
+					campos.add(new CampoPojo(campoForm.label(), isRequerido(campo), campo.getName(), getOpcoes(campo),
+							campoForm.tipo().name(), getTamanho(campo), campoForm.editavel(), campoForm.pesquisavel()));
+				} else if (containsAnotationsRelacionamento(campo)) {
+					Boolean isFormInList = false;
+					if (List.class.equals(campo.getType())) {
+						isFormInList = getTypeList(campo).isAnnotationPresent(Form.class);
+					}
+					if (campo.getType().getClass().isAnnotationPresent(Form.class) || isFormInList) {
+						Class<?> clazzEntidadeFilha;
+						if (campoIsList(campo)) {
+							clazzEntidadeFilha = getTypeList(campo);
+						} else {
+							clazzEntidadeFilha = campo.getType().getClass();
+						}
+
+						List<CampoPojo> camposEntidadeFilha = getCampos(clazzEntidadeFilha, entidades, levelClazz++);
+						entidades.add(new EntidadePojo(getEntidadeNome(campo), camposEntidadeFilha,
+								getTipoEntidade(campo), true, clazzEntidadeFilha.getName()));
+
+					}
 				}
 			}
 		}
@@ -97,7 +117,7 @@ public class CreateForms {
 
 	private static String[] getOpcoes(Field campo) {
 		if (campo.getType() == Boolean.class || campo.getType() == boolean.class) {
-			return new String[] { "Sim, N�o" };
+			return new String[] { "Sim, Não" };
 		} else {
 			return campo.getAnnotation(CampoForm.class).opcoes();
 		}
@@ -108,37 +128,62 @@ public class CreateForms {
 				| campo.isAnnotationPresent(OneToOne.class) | campo.isAnnotationPresent(OneToMany.class);
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	private static TipoEntidade getTipoEntidade(Field campo) {
 		if (campo.isAnnotationPresent(ManyToMany.class)) {
 			if (campo.getAnnotation(ManyToMany.class).cascade() != null) {
-				if (campo.getAnnotation(ManyToMany.class).cascade().equals(CascadeType.ALL)) {
+				if (isCascadeAll(campo.getAnnotation(ManyToMany.class).cascade())) {
 					return TipoEntidade.ADICIONAVEL_MUITOS;
 				}
 			}
 			return TipoEntidade.PESQUISAVEL_MUITOS;
 		} else if (campo.isAnnotationPresent(ManyToOne.class)) {
 			if (campo.getAnnotation(ManyToOne.class).cascade() != null) {
-				if (campo.getAnnotation(ManyToOne.class).cascade().equals(CascadeType.ALL)) {
+				if (isCascadeAll(campo.getAnnotation(ManyToOne.class).cascade())) {
 					return TipoEntidade.ADICIONAVEL_UM;
 				}
 			}
 			return TipoEntidade.PESQUISAVEL_UM;
 		} else if (campo.isAnnotationPresent(OneToOne.class)) {
 			if (campo.getAnnotation(OneToOne.class).cascade() != null) {
-				if (campo.getAnnotation(OneToOne.class).cascade().equals(CascadeType.ALL)) {
+				if (isCascadeAll(campo.getAnnotation(OneToOne.class).cascade())) {
 					return TipoEntidade.ADICIONAVEL_UM;
 				}
 			}
 			return TipoEntidade.PESQUISAVEL_UM;
 		} else if (campo.isAnnotationPresent(OneToMany.class)) {
 			if (campo.getAnnotation(OneToMany.class).cascade() != null) {
-				if (campo.getAnnotation(OneToMany.class).cascade().equals(CascadeType.ALL)) {
+				if (isCascadeAll(campo.getAnnotation(OneToMany.class).cascade())) {
 					return TipoEntidade.ADICIONAVEL_MUITOS;
 				}
 			}
 			return TipoEntidade.PESQUISAVEL_MUITOS;
 		}
 		return null;
+	}
+
+	private static Class<?> getTypeList(Field campo) {
+		ParameterizedType parameter = (ParameterizedType) campo.getGenericType();
+		return (Class<?>) parameter.getActualTypeArguments()[0];
+	}
+
+	private static boolean campoIsList(Field campo) {
+		return List.class.equals(campo.getType());
+	}
+
+	private static String getEntidadeNome(Field campo) {
+		if (campoIsList(campo)) {
+			return getTypeList(campo).getAnnotation(Form.class).nomeEntidade();
+		} else {
+			return campo.getType().getClass().getAnnotation(Form.class).nomeEntidade();
+		}
+	}
+
+	private static boolean isCascadeAll(CascadeType[] cascade) {
+		for (CascadeType cascadeType : cascade) {
+			if (cascadeType.equals(CascadeType.ALL)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

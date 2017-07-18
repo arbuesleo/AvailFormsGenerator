@@ -16,4 +16,5 @@ public @interface Form {
 	public Orientacao orientacao() default Orientacao.HORIZONTAL;	
 	public String[] acoesCrud() default "INC, EDI, DEL";
 	public String nomeEntidade();
+	public String nomeClazz() default "";
 }

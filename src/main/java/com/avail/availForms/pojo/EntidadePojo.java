@@ -6,24 +6,26 @@ import com.avail.availForms.enuns.TipoEntidade;
 
 public class EntidadePojo {
 	
-	private String nome;
+	private String labelClazz;
 	private List<CampoPojo> campos;
 	private TipoEntidade tipo;
 	private Boolean editavel;
+	private String nomeClazz;
 	
-	public EntidadePojo(String nome, List<CampoPojo> campos, TipoEntidade tipo, Boolean editavel) {
+	public EntidadePojo(String labelClazz, List<CampoPojo> campos, TipoEntidade tipo, Boolean editavel, String nomeClazz) {
 		super();
-		this.nome = nome;
+		this.labelClazz = labelClazz;
 		this.campos = campos;
 		this.tipo = tipo;
 		this.editavel = editavel;
+		this.nomeClazz = nomeClazz.replace(".", "_");
 	}
 	
-	public String getNome() {
-		return nome;
+	public String getLabelClazz() {
+		return labelClazz;
 	}
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setLabelClazz(String labelClazz) {
+		this.labelClazz = labelClazz;
 	}
 	public List<CampoPojo> getCampos() {
 		return campos;
@@ -43,4 +45,14 @@ public class EntidadePojo {
 	public void setEditavel(Boolean editavel) {
 		this.editavel = editavel;
 	}
+
+	public String getNomeClazz() {
+		return nomeClazz;
+	}
+
+	public void setNomeClazz(String nomeClazz) {
+		this.nomeClazz = nomeClazz.replace(".", "_");
+	}
+	
+	
 }

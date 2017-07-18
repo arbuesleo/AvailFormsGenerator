@@ -5,6 +5,13 @@
 	<artifactId>AvailForms</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>FormsAvail</name>
+	
+	<distributionManagement>
+  <repository>
+    <id>myMavenRepo.write</id>
+    <url>https://mymavenrepo.com/repo/0dyna99zU5wI6xAT4xpG/</url>
+  </repository>
+</distributionManagement>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
