@@ -28,9 +28,9 @@ public class CreateForms {
 	private static int levelClazz = 0;
 
 	public static FormPojo getDadosForm(Class<?> clazz) throws Exception {
-
+		
 		levelClazz = 0;
-
+		
 		if (!clazz.isAnnotationPresent(Form.class)) {
 			throw new Exception("Anotação Form não está presente na entidade.");
 		}
@@ -119,7 +119,23 @@ public class CreateForms {
 		if (campo.getType() == Boolean.class || campo.getType() == boolean.class) {
 			return new String[] { "Sim, Não" };
 		} else {
-			return campo.getAnnotation(CampoForm.class).opcoes();
+			if(campo.getType().isEnum()) {
+				try {
+					Class<?> c = Class.forName(campo.getType().getCanonicalName());
+					Object[] opcoesEnum = c.getEnumConstants();
+					String [] opcoes = new String[opcoesEnum.length];
+					int i = 0;
+					for(Object opcao : opcoesEnum) {
+						opcoes[i] = new String(opcao.toString());
+						i++;
+					}
+					return opcoes;
+				} catch (ClassNotFoundException e) {
+					return campo.getAnnotation(CampoForm.class).opcoes();
+				}				
+			}else {
+				return campo.getAnnotation(CampoForm.class).opcoes();
+			}
 		}
 	}
 
