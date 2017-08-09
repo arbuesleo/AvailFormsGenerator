@@ -11,12 +11,14 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.hibernate.validator.constraints.NotBlank;
 
 import com.avail.availForms.annotation.CampoForm;
 import com.avail.availForms.annotation.Form;
-import com.avail.availForms.annotation.ListagemForm;
+import com.avail.availForms.annotation.Image;
+import com.avail.availForms.enuns.TipoCampo;
 import com.avail.availForms.enuns.TipoEntidade;
 import com.avail.availForms.pojo.CampoPojo;
 import com.avail.availForms.pojo.EntidadePojo;
@@ -27,10 +29,12 @@ public class CreateForms {
 
 	private static int levelClazz = 0;
 
+	private static List<CampoPojo> camposAux = new ArrayList<CampoPojo>();
+
 	public static FormPojo getDadosForm(Class<?> clazz) throws Exception {
-		
+
 		levelClazz = 0;
-		
+
 		if (!clazz.isAnnotationPresent(Form.class)) {
 			throw new Exception("Anotação Form não está presente na entidade.");
 		}
@@ -38,7 +42,7 @@ public class CreateForms {
 		List<EntidadePojo> entidades = new ArrayList<EntidadePojo>();
 
 		entidades.add(new EntidadePojo(clazz.getAnnotation(Form.class).nomeEntidade(), new ArrayList<CampoPojo>(),
-				TipoEntidade.PRINCIPAL, true, clazz.getName()));
+				TipoEntidade.PRINCIPAL, true, clazz.getSimpleName(), clazz.getName(), getDadosListagem(clazz), false));
 
 		entidades.get(0).setCampos(getCampos(clazz, entidades, levelClazz));
 
@@ -48,54 +52,87 @@ public class CreateForms {
 	private static List<CampoPojo> getCampos(Class<?> clazz, List<EntidadePojo> entidades, int levelClazz)
 			throws Exception {
 		List<CampoPojo> campos = new ArrayList<CampoPojo>();
-		if (levelClazz < 2) {
-			for (Field campo : clazz.getDeclaredFields()) {
-				if (campo.isAnnotationPresent(CampoForm.class) && containsAnotationsRelacionamento(campo)) {
-					throw new Exception(
-							"Um campo não pode conter a anotação @CampoForm e ao mesmo tempo ser um relacionamento.");
+		for (Field campo : clazz.getDeclaredFields()) {
+			if (campo.isAnnotationPresent(CampoForm.class) && containsAnotationsRelacionamento(campo)) {
+				throw new Exception(
+						"Um campo não pode conter a anotação @CampoForm e ao mesmo tempo ser um relacionamento.");
+			}
+			if (campo.isAnnotationPresent(CampoForm.class)) {
+				CampoForm campoForm = campo.getAnnotation(CampoForm.class);
+				campos.add(new CampoPojo(campoForm.label(), isRequerido(campo), campo.getName(), getOpcoes(campo),
+						campoForm.tipo().name(), getTamanho(campo), campoForm.editavel()));
+			} else if (containsAnotationsRelacionamento(campo)) {
+				Boolean isFormInList = false;
+				if (List.class.equals(campo.getType())) {
+					isFormInList = getTypeList(campo).isAnnotationPresent(Form.class);
 				}
-				if (campo.isAnnotationPresent(CampoForm.class)) {
-					CampoForm campoForm = campo.getAnnotation(CampoForm.class);
-					campos.add(new CampoPojo(campoForm.label(), isRequerido(campo), campo.getName(), getOpcoes(campo),
-							campoForm.tipo().name(), getTamanho(campo), campoForm.editavel(), campoForm.pesquisavel()));
-				} else if (containsAnotationsRelacionamento(campo)) {
-					Boolean isFormInList = false;
-					if (List.class.equals(campo.getType())) {
-						isFormInList = getTypeList(campo).isAnnotationPresent(Form.class);
-					}
-					if (campo.getType().getClass().isAnnotationPresent(Form.class) || isFormInList) {
-						Class<?> clazzEntidadeFilha;
-						if (campoIsList(campo)) {
-							clazzEntidadeFilha = getTypeList(campo);
+				if (campo.isAnnotationPresent(Image.class)) {
+					CampoPojo campoAux = new CampoPojo(campo.getAnnotation(Image.class).label(),
+							(campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class)),
+							campo.getName(), null, TipoCampo.IMAGEM.name(), 0, Boolean.TRUE);
+					campoAux.setQuantidadeImagens(campo.getAnnotation(Image.class).qtdImgs());
+					camposAux.add(campoAux);
+				} else if (campo.getType().getClass().isAnnotationPresent(Form.class)
+						|| campo.getType().isAnnotationPresent(Form.class) || isFormInList) {
+
+					Class<?> clazzEntidadeFilha;
+					if (campoIsList(campo)) {
+						clazzEntidadeFilha = getTypeList(campo);
+					} else {
+						if (campo.getType().getClass() instanceof Class) {
+							clazzEntidadeFilha = campo.getType();
 						} else {
 							clazzEntidadeFilha = campo.getType().getClass();
 						}
+					}
+					if (getTipoEntidade(campo) == TipoEntidade.PESQUISAVEL_UM) {
+						CampoPojo campoAux = new CampoPojo(campo.getType().getAnnotation(Form.class).nomeEntidade(),
+								(campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class)),
+								campo.getName(), null, TipoCampo.PESQUISA.name(), 0, Boolean.FALSE);
+						campoAux.setDadosListagem(getDadosListagem(campo.getType()));
+						camposAux.add(campoAux);
 
+					} else {
 						List<CampoPojo> camposEntidadeFilha = getCampos(clazzEntidadeFilha, entidades, levelClazz++);
 						entidades.add(new EntidadePojo(getEntidadeNome(campo), camposEntidadeFilha,
-								getTipoEntidade(campo), true, clazzEntidadeFilha.getName()));
+								getTipoEntidade(campo), true, campo.getName(), clazzEntidadeFilha.getName(),
+								getDadosListagem(clazzEntidadeFilha), (campo.isAnnotationPresent(NotBlank.class)
+										|| campo.isAnnotationPresent(NotNull.class))));
 
 					}
+
+					if (camposAux.size() > 0) {
+						for (CampoPojo camp : camposAux) {
+							campos.add(camp);
+						}
+						camposAux = new ArrayList<CampoPojo>();
+					}
+
 				}
 			}
 		}
+
 		return campos;
 	}
 
-	public static ListagemPojo getDadosListagem(Class<?> clazz, JdbcTemplate jdbcTemplate) throws Exception {
+	public static ListagemPojo getDadosListagem(Class<?> clazz) throws Exception {
+		List<String> camposPesquisa = new ArrayList<String>();
+		List<String> labels = new ArrayList<String>();
 
-		if (clazz.isAnnotationPresent(ListagemForm.class)) {
-
-			String viewNome = clazz.getAnnotation(ListagemForm.class).viewNome();
-			String entidadeNome = clazz.getAnnotation(ListagemForm.class).nomeEntidade();
-
-			List<String> campos = jdbcTemplate.queryForList(
-					"SELECT column_name FROM information_schema.columns WHERE table_name =" + viewNome, String.class);
-
-			return new ListagemPojo(entidadeNome, viewNome, campos.toArray(new String[0]));
-
+		if (clazz.isAnnotationPresent(Form.class)) {
+			for (Field campo : clazz.getDeclaredFields()) {
+				if (campo.isAnnotationPresent(CampoForm.class)) {
+					CampoForm campoForm = campo.getAnnotation(CampoForm.class);
+					if (campoForm.listagem()) {
+						camposPesquisa.add(campo.getName());
+						labels.add(campoForm.label());
+					}
+				}
+			}
+			return new ListagemPojo(clazz.getAnnotation(Form.class).nomeEntidade() + "s", camposPesquisa, labels,
+					clazz.getName());
 		} else {
-			throw new Exception("Anotação @ListagemForm não está presente na entidade.");
+			throw new Exception("Anotação Form não está presente na entidade.");
 		}
 	}
 
@@ -119,21 +156,21 @@ public class CreateForms {
 		if (campo.getType() == Boolean.class || campo.getType() == boolean.class) {
 			return new String[] { "Sim, Não" };
 		} else {
-			if(campo.getType().isEnum()) {
+			if (campo.getType().isEnum()) {
 				try {
 					Class<?> c = Class.forName(campo.getType().getCanonicalName());
 					Object[] opcoesEnum = c.getEnumConstants();
-					String [] opcoes = new String[opcoesEnum.length];
+					String[] opcoes = new String[opcoesEnum.length];
 					int i = 0;
-					for(Object opcao : opcoesEnum) {
+					for (Object opcao : opcoesEnum) {
 						opcoes[i] = new String(opcao.toString());
 						i++;
 					}
 					return opcoes;
 				} catch (ClassNotFoundException e) {
 					return campo.getAnnotation(CampoForm.class).opcoes();
-				}				
-			}else {
+				}
+			} else {
 				return campo.getAnnotation(CampoForm.class).opcoes();
 			}
 		}

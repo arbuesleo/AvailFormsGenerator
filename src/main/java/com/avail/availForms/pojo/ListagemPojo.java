@@ -1,17 +1,20 @@
 package com.avail.availForms.pojo;
 
+import java.util.List;
+
 public class ListagemPojo {
 	
 	private String nomeEntidade;
-	private String nomeView;
-	//TODO: SELECT column_name FROM information_schema.columns WHERE table_name = 'nomeView';
-	private String[] camposPesquisa;
+	private List<String> labels;
+	private List<String> camposPesquisa;
+	private String longNameClazz;
 	
-	public ListagemPojo(String nomeEntidade, String nomeView, String[] camposPesquisa) {
+	public ListagemPojo(String nomeEntidade, List<String> camposPesquisa, List<String> labels, String longNameClazz) {
 		super();
 		this.nomeEntidade = nomeEntidade;
-		this.nomeView = nomeView;
 		this.camposPesquisa = camposPesquisa;
+		this.labels = labels;
+		this.longNameClazz = longNameClazz;
 	}
 
 	public String getNomeEntidade() {
@@ -20,22 +23,29 @@ public class ListagemPojo {
 
 	public void setNomeEntidade(String nomeEntidade) {
 		this.nomeEntidade = nomeEntidade;
+	}	
+
+	public List<String> getLabels() {
+		return labels;
 	}
 
-	public String getNomeView() {
-		return nomeView;
+	public void setLabels(List<String> labels) {
+		this.labels = labels;
 	}
 
-	public void setNomeView(String nomeView) {
-		this.nomeView = nomeView;
-	}
-
-	public String[] getCamposPesquisa() {
+	public List<String>getCamposPesquisa() {
 		return camposPesquisa;
 	}
 
-	public void setCamposPesquisa(String[] camposPesquisa) {
+	public void setCamposPesquisa(List<String> camposPesquisa) {
 		this.camposPesquisa = camposPesquisa;
 	}
-	
+
+	public String getLongNameClazz() {
+		return longNameClazz;
+	}
+
+	public void setLongNameClazz(String longNameClazz) {
+		this.longNameClazz = longNameClazz;
+	}	
 }

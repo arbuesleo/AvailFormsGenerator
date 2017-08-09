@@ -14,5 +14,5 @@ public @interface CampoForm {
 	public String[] opcoes() default "";
 	public TipoCampo tipo() default TipoCampo.TEXTO;
 	public boolean editavel() default true;
-	public boolean pesquisavel() default false;
+	public boolean listagem() default false;
 }

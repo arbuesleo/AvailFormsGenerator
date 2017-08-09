@@ -8,11 +8,19 @@ public class CampoPojo {
 	private String tipoCampo;
 	private Integer tamanho;
 	private Boolean editavel;
-	private Boolean pesquisavel;
 	private String nome;
+	private String nomeClazzPesquisa; 
+	private ListagemPojo dadosListagem;
+	private Integer quantidadeImagens;
 	
+	public ListagemPojo getDadosListagem() {
+		return dadosListagem;
+	}
+	public void setDadosListagem(ListagemPojo dadosListagem) {
+		this.dadosListagem = dadosListagem;
+	}
 	public CampoPojo(String label, Boolean requerido, String nome,String[] opcoes, String tipoCampo, Integer tamanho,
-			Boolean editavel, Boolean pesquisavel) {
+			Boolean editavel) {
 		super();
 		this.label = label;
 		this.requerido = requerido;
@@ -20,8 +28,13 @@ public class CampoPojo {
 		this.tipoCampo = tipoCampo;
 		this.tamanho = tamanho;
 		this.editavel = editavel;
-		this.pesquisavel = pesquisavel;
 		this.nome = nome;
+	}
+	public String getNomeClazzPesquisa() {
+		return nomeClazzPesquisa;
+	}
+	public void setNomeClazzPesquisa(String nomeClazzPesquisa) {
+		this.nomeClazzPesquisa = nomeClazzPesquisa;
 	}
 	public String getLabel() {
 		return label;
@@ -59,16 +72,16 @@ public class CampoPojo {
 	public void setEditavel(Boolean editavel) {
 		this.editavel = editavel;
 	}
-	public Boolean getPesquisavel() {
-		return pesquisavel;
-	}
-	public void setPesquisavel(Boolean pesquisavel) {
-		this.pesquisavel = pesquisavel;
-	}
 	public String getNome() {
 		return nome;
 	}
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+	public Integer getQuantidadeImagens() {
+		return quantidadeImagens;
+	}
+	public void setQuantidadeImagens(Integer quantidadeImagens) {
+		this.quantidadeImagens = quantidadeImagens;
 	}
 }

@@ -11,14 +11,20 @@ public class EntidadePojo {
 	private TipoEntidade tipo;
 	private Boolean editavel;
 	private String nomeClazz;
+	private String longNomeClazz;
+	private ListagemPojo dadosListagem;
+	private Boolean requerido;
 	
-	public EntidadePojo(String labelClazz, List<CampoPojo> campos, TipoEntidade tipo, Boolean editavel, String nomeClazz) {
+	public EntidadePojo(String labelClazz, List<CampoPojo> campos, TipoEntidade tipo, Boolean editavel, String nomeClazz, String longNomeClazz, ListagemPojo dadosListagem, Boolean requerido) {
 		super();
 		this.labelClazz = labelClazz;
 		this.campos = campos;
 		this.tipo = tipo;
 		this.editavel = editavel;
-		this.nomeClazz = nomeClazz.replace(".", "_");
+		this.nomeClazz = nomeClazz;
+		this.longNomeClazz = longNomeClazz;
+		this.dadosListagem = dadosListagem;
+		this.requerido = requerido;
 	}
 	
 	public String getLabelClazz() {
@@ -51,8 +57,31 @@ public class EntidadePojo {
 	}
 
 	public void setNomeClazz(String nomeClazz) {
-		this.nomeClazz = nomeClazz.replace(".", "_");
+		this.nomeClazz = nomeClazz;
 	}
-	
+
+	public String getLongNomeClazz() {
+		return longNomeClazz;
+	}
+
+	public void setLongNomeClazz(String longNomeClazz) {
+		this.longNomeClazz = longNomeClazz;
+	}
+
+	public ListagemPojo getDadosListagem() {
+		return dadosListagem;
+	}
+
+	public void setDadosListagem(ListagemPojo dadosListagem) {
+		this.dadosListagem = dadosListagem;
+	}
+
+	public Boolean getRequerido() {
+		return requerido;
+	}
+
+	public void setRequerido(Boolean requerido) {
+		this.requerido = requerido;
+	}
 	
 }

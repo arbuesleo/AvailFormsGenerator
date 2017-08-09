@@ -5,13 +5,13 @@
 	<artifactId>AvailForms</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>FormsAvail</name>
-	
+
 	<distributionManagement>
-  <repository>
-    <id>myMavenRepo.write</id>
-    <url>https://mymavenrepo.com/repo/0dyna99zU5wI6xAT4xpG/</url>
-  </repository>
-</distributionManagement>
+		<repository>
+			<id>myMavenRepo.write</id>
+			<url>https://mymavenrepo.com/repo/0dyna99zU5wI6xAT4xpG/</url>
+		</repository>
+	</distributionManagement>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -32,5 +32,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
+		
+		<!-- SPRING BOOT WEB -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
 	</dependencies>
 </project>
