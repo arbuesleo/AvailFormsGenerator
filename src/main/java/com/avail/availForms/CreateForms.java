@@ -27,13 +27,9 @@ import com.avail.availForms.pojo.ListagemPojo;
 
 public class CreateForms {
 
-	private static int levelClazz = 0;
-
 	private static List<CampoPojo> camposAux = new ArrayList<CampoPojo>();
 
 	public static FormPojo getDadosForm(Class<?> clazz) throws Exception {
-
-		levelClazz = 0;
 
 		if (!clazz.isAnnotationPresent(Form.class)) {
 			throw new Exception("Anotação Form não está presente na entidade.");
@@ -44,12 +40,12 @@ public class CreateForms {
 		entidades.add(new EntidadePojo(clazz.getAnnotation(Form.class).nomeEntidade(), new ArrayList<CampoPojo>(),
 				TipoEntidade.PRINCIPAL, true, clazz.getSimpleName(), clazz.getName(), getDadosListagem(clazz), false));
 
-		entidades.get(0).setCampos(getCampos(clazz, entidades, levelClazz));
+		entidades.get(0).setCampos(getCampos(clazz, entidades, true));
 
 		return new FormPojo(clazz.getAnnotation(Form.class).orientacao().toString(), entidades);
 	}
 
-	private static List<CampoPojo> getCampos(Class<?> clazz, List<EntidadePojo> entidades, int levelClazz)
+	private static List<CampoPojo> getCampos(Class<?> clazz, List<EntidadePojo> entidades, Boolean buscaRelacionamentos)
 			throws Exception {
 		List<CampoPojo> campos = new ArrayList<CampoPojo>();
 		for (Field campo : clazz.getDeclaredFields()) {
@@ -61,8 +57,9 @@ public class CreateForms {
 				CampoForm campoForm = campo.getAnnotation(CampoForm.class);
 				campos.add(new CampoPojo(campoForm.label(), isRequerido(campo), campo.getName(), getOpcoes(campo),
 						campoForm.tipo().name(), getTamanho(campo), campoForm.editavel()));
-			} else if (containsAnotationsRelacionamento(campo)) {
+			} else if (containsAnotationsRelacionamento(campo) && buscaRelacionamentos) {
 				Boolean isFormInList = false;
+				Boolean buscaRelacionamentoFilhos = (getTipoEntidade(campo) == TipoEntidade.PRINCIPAL || getTipoEntidade(campo) == TipoEntidade.ADICIONAVEL_UM || getTipoEntidade(campo) == TipoEntidade.ADICIONAVEL_MUITOS);
 				if (List.class.equals(campo.getType())) {
 					isFormInList = getTypeList(campo).isAnnotationPresent(Form.class);
 				}
@@ -92,9 +89,10 @@ public class CreateForms {
 						campoAux.setDadosListagem(getDadosListagem(campo.getType()));
 						camposAux.add(campoAux);
 
-					} else {
-						List<CampoPojo> camposEntidadeFilha = getCampos(clazzEntidadeFilha, entidades, levelClazz++);
-						entidades.add(new EntidadePojo(getEntidadeNome(campo), camposEntidadeFilha,
+					} else {						
+						List<CampoPojo> camposEntidadeFilha = getCampos(clazzEntidadeFilha, entidades, buscaRelacionamentoFilhos);
+						String plural = (getTipoEntidade(campo) == TipoEntidade.ADICIONAVEL_MUITOS || getTipoEntidade(campo) == TipoEntidade.PESQUISAVEL_MUITOS) ? "s" : "";
+						entidades.add(new EntidadePojo(getEntidadeNome(campo) + plural, camposEntidadeFilha,
 								getTipoEntidade(campo), true, campo.getName(), clazzEntidadeFilha.getName(),
 								getDadosListagem(clazzEntidadeFilha), (campo.isAnnotationPresent(NotBlank.class)
 										|| campo.isAnnotationPresent(NotNull.class))));
