@@ -50,32 +50,37 @@ public class CreateForms {
 		List<CampoPojo> campos = new ArrayList<CampoPojo>();
 		for (Field campo : clazz.getDeclaredFields()) {
 			if (campo.isAnnotationPresent(CampoForm.class) && containsAnotationsRelacionamento(campo)) {
-				throw new Exception(
-						"Um campo não pode conter a anotação @CampoForm e ao mesmo tempo ser um relacionamento.");
+				throw new Exception("Um campo não pode conter a anotação @CampoForm e ao mesmo tempo ser um relacionamento.");
 			}
 			if (campo.isAnnotationPresent(CampoForm.class)) {
+				
 				CampoForm campoForm = campo.getAnnotation(CampoForm.class);
-				campos.add(new CampoPojo(campoForm.label(), isRequerido(campo), campo.getName(), getOpcoes(campo),
-						campoForm.tipo().name(), getTamanho(campo), campoForm.editavel()));
+				campos.add(new CampoPojo(campoForm.label(), isRequerido(campo), campo.getName(), getOpcoes(campo), campoForm.tipo().name(), getTamanho(campo), campoForm.editavel()));
+				
 			} else if (containsAnotationsRelacionamento(campo) && buscaRelacionamentos) {
+				
 				Boolean isFormInList = false;
 				Boolean buscaRelacionamentoFilhos = (getTipoEntidade(campo) == TipoEntidade.PRINCIPAL || getTipoEntidade(campo) == TipoEntidade.ADICIONAVEL_UM || getTipoEntidade(campo) == TipoEntidade.ADICIONAVEL_MUITOS);
 				if (List.class.equals(campo.getType())) {
+				
 					isFormInList = getTypeList(campo).isAnnotationPresent(Form.class);
 				}
+				
 				if (campo.isAnnotationPresent(Image.class)) {
-					CampoPojo campoAux = new CampoPojo(campo.getAnnotation(Image.class).label(),
-							(campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class)),
-							campo.getName(), null, TipoCampo.IMAGEM.name(), 0, Boolean.TRUE);
+				
+					CampoPojo campoAux = new CampoPojo(campo.getAnnotation(Image.class).label(),(campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class)),campo.getName(), null, TipoCampo.IMAGEM.name(), 0, Boolean.TRUE);
 					campoAux.setQuantidadeImagens(campo.getAnnotation(Image.class).qtdImgs());
 					camposAux.add(campoAux);
-				} else if (campo.getType().getClass().isAnnotationPresent(Form.class)
-						|| campo.getType().isAnnotationPresent(Form.class) || isFormInList) {
+					
+				} else if (campo.getType().getClass().isAnnotationPresent(Form.class) || campo.getType().isAnnotationPresent(Form.class) || isFormInList) {
 
 					Class<?> clazzEntidadeFilha;
+					
 					if (campoIsList(campo)) {
+						
 						clazzEntidadeFilha = getTypeList(campo);
-					} else {
+						
+					} else {						
 						if (campo.getType().getClass() instanceof Class) {
 							clazzEntidadeFilha = campo.getType();
 						} else {
@@ -83,22 +88,16 @@ public class CreateForms {
 						}
 					}
 					if (getTipoEntidade(campo) == TipoEntidade.PESQUISAVEL_UM) {
-						CampoPojo campoAux = new CampoPojo(campo.getType().getAnnotation(Form.class).nomeEntidade(),
-								(campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class)),
-								campo.getName(), null, TipoCampo.PESQUISA.name(), 0, Boolean.FALSE);
+						CampoPojo campoAux = new CampoPojo(campo.getType().getAnnotation(Form.class).nomeEntidade(), (campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class)),campo.getName(), null, TipoCampo.PESQUISA.name(), 0, Boolean.FALSE);
 						campoAux.setDadosListagem(getDadosListagem(campo.getType()));
 						camposAux.add(campoAux);
 
 					} else {						
 						List<CampoPojo> camposEntidadeFilha = getCampos(clazzEntidadeFilha, entidades, buscaRelacionamentoFilhos);
 						String plural = (getTipoEntidade(campo) == TipoEntidade.ADICIONAVEL_MUITOS || getTipoEntidade(campo) == TipoEntidade.PESQUISAVEL_MUITOS) ? "s" : "";
-						entidades.add(new EntidadePojo(getEntidadeNome(campo) + plural, camposEntidadeFilha,
-								getTipoEntidade(campo), true, campo.getName(), clazzEntidadeFilha.getName(),
-								getDadosListagem(clazzEntidadeFilha), (campo.isAnnotationPresent(NotBlank.class)
-										|| campo.isAnnotationPresent(NotNull.class))));
-
+						entidades.add(new EntidadePojo(getEntidadeNome(campo) + plural, camposEntidadeFilha, getTipoEntidade(campo), true, campo.getName(), clazzEntidadeFilha.getName(), getDadosListagem(clazzEntidadeFilha), (campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class))));
 					}
-
+					
 					if (camposAux.size() > 0) {
 						for (CampoPojo camp : camposAux) {
 							campos.add(camp);
@@ -109,7 +108,6 @@ public class CreateForms {
 				}
 			}
 		}
-
 		return campos;
 	}
 
@@ -119,6 +117,7 @@ public class CreateForms {
 
 		if (clazz.isAnnotationPresent(Form.class)) {
 			for (Field campo : clazz.getDeclaredFields()) {
+				
 				if (campo.isAnnotationPresent(CampoForm.class)) {
 					CampoForm campoForm = campo.getAnnotation(CampoForm.class);
 					if (campoForm.listagem()) {
@@ -126,6 +125,7 @@ public class CreateForms {
 						labels.add(campoForm.label());
 					}
 				}
+				
 			}
 			return new ListagemPojo(clazz.getAnnotation(Form.class).nomeEntidade() + "s", camposPesquisa, labels,
 					clazz.getName());
@@ -152,7 +152,9 @@ public class CreateForms {
 
 	private static String[] getOpcoes(Field campo) {
 		if (campo.getType() == Boolean.class || campo.getType() == boolean.class) {
+			
 			return new String[] { "Sim, Não" };
+			
 		} else {
 			if (campo.getType().isEnum()) {
 				try {
