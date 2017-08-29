@@ -2,6 +2,5 @@ language: java
 script:
   -mvn -B verify
   -mvn clean install
-  -mvn -s settings-maven.xml deploy
 jdk:
  - oraclejdk8
