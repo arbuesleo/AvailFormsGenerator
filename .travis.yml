@@ -2,5 +2,6 @@ language: java
 script: 
   - mvn test
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn -s settings-maven.xml -DskipTests=true -Dmaven.javadoc.skip=true -B -V deploy
 jdk:
   - oraclejdk8
