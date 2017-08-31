@@ -48,11 +48,11 @@ Para utilizar o AvailFormsGenerator em seu projeto java com [Maven](https://mave
 		</dependency>
 	</dependencies>
 ```
-##<a name="anotacoes"></a> Anotações
+## <a name="anotacoes"></a> Anotações
 
 As anotações são a base de nosso projeto, é atrvés delas que iremos mapear nossas classes para geração das dados de nossa tela. São 3 as principais anotações, @Form, uma anotação a nível de classe que irá identificar essa classe como um formulário.
 
-##<a name="form"></a> @Form
+## <a name="form"></a> @Form
 
  - Exemplo
     ```java
@@ -63,7 +63,7 @@ As anotações são a base de nosso projeto, é atrvés delas que iremos mapear 
     - nomeEntidade: Esse atributo é obrigatório e servirá para identificar o nome de nossa tela.
     - oritenracao: Esse não é obrigatório e servirá para identificar a orientação de nosso formulário sendo dois tipos, HORIZONTAL e VERTICAL, o valor default é HORIZONTAL.
 
-##<a name="campoForm"></a> @CampoFrom
+## <a name="campoForm"></a> @CampoFrom
 
 A anotação @CampoForm é uma anotação a nivel de atributo de classes e será utilizada para identificar um atributo como um campo do formulário.
 
@@ -103,7 +103,7 @@ A anotação @CampoForm é uma anotação a nivel de atributo de classes e será
     - editavel: Representa se o campo é editavel ou não. Não obrigatório, valor default TRUE.
     - listagem: Representa se o campo estrá presente na apresentação de listagem do objeto. Não obrigatório, valor default FALSE.
     
-##<a name="imagem"></a> @Image
+## <a name="imagem"></a> @Image
 
 A anotação @Image será utilizada para identificar o campo como um campo que representa uma imagem.
  - Exemplo
@@ -118,7 +118,7 @@ A anotação @Image será utilizada para identificar o campo como um campo que r
     - label: Será o label utilizado na apresentação do campo, atributo obrigatório.
     - qtdImgs: Quantidade de imagens que será possivél inserir no campo.
     - 
-##<a name="relacionamentos"></a> Relacionamento entre Entidades
+## <a name="relacionamentos"></a> Relacionamento entre Entidades
 
 A nossa ferramenta suporta criação de subtelas de relacionamentos de nosso objeto mapeado, para isso basta nossa classe principal estar campo o campo relacionado mapeado com uma das anotações de relacionamento do [javax.persistence](https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html), os relacionamentos suportados estão listados na tabela abaixo, e a classe relacionada precisa estar mapeada com a anotação @Form e seus campos com a anotação @CampoForm
 
@@ -134,7 +134,7 @@ A nossa ferramenta suporta criação de subtelas de relacionamentos de nosso obj
     | @OneToMany | ADICIONAVEL_MUITOS |
     | @OneToMany(cascade = CascadeType.ALL) | PESQUISAVEL_MUITOS|
 
-##<a name="gerDadosForm"></a> Geração de dados do formulário
+## <a name="gerDadosForm"></a> Geração de dados do formulário
 
 Para gerar os dados do formulário será necessário acessar o método static CreateForms.getDadosForm(java.lang.Class<?>) passando a classe que você deseja criar o formulário, esse metódo irá retornar um objeto do tipo FormPojo com os dados de seu formulário, utilizando o exempo do usuário que utilizamos anteriormente:
 - Classes:
@@ -219,7 +219,7 @@ Como você pode observar existem alguns atributos de nosso Objeto acima que não
     | entidades[0].dadosListagem | São os campos cujo a anotação @CampoForm(listagem = true) esteja presente|
     | entidades[0].longNomeClazz | É o nome da classe incluindo seu pacote|
     
-##<a name="gerDadosListagem"></a> Geração de dados de Listagem
+## <a name="gerDadosListagem"></a> Geração de dados de Listagem
 
 A geração de dados de listagem tem o objetivo de gerar dados para tela de listagem daquela entidade, o metódo que deve ser chamado é o:
 
