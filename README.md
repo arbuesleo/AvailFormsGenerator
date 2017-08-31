@@ -59,7 +59,7 @@ As anotações são a base de nosso projeto, é atrvés delas que iremos mapear 
     @Form(nomeEntidade = "Usuário", orientacao = Orientacao.HORIZONTAL)
     public class UsuarioEntity
     ```
-- Atributos da anotção @Form
+- Atributos da anotação @Form
     - nomeEntidade: Esse atributo é obrigatório e servirá para identificar o nome de nossa tela.
     - oritenracao: Esse não é obrigatório e servirá para identificar a orientação de nosso formulário sendo dois tipos, HORIZONTAL e VERTICAL, o valor default é HORIZONTAL.
 
@@ -117,10 +117,10 @@ A anotação @Image será utilizada para identificar o campo como um campo que r
 - Atributos da anotção @Image
     - label: Será o label utilizado na apresentação do campo, atributo obrigatório.
     - qtdImgs: Quantidade de imagens que será possivél inserir no campo.
-    - 
+    
 ## <a name="relacionamentos"></a> Relacionamento entre Entidades
 
-A nossa ferramenta suporta criação de subtelas de relacionamentos de nosso objeto mapeado, para isso basta nossa classe principal estar campo o campo relacionado mapeado com uma das anotações de relacionamento do [javax.persistence](https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html), os relacionamentos suportados estão listados na tabela abaixo, e a classe relacionada precisa estar mapeada com a anotação @Form e seus campos com a anotação @CampoForm
+A nossa ferramenta suporta criação de subtelas de relacionamentos de nosso objeto mapeado, para isso basta nossa classe principal estar com o campo relacionado mapeado com uma das anotações de relacionamento do [javax.persistence](https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html), os relacionamentos suportados estão listados na tabela abaixo, e a classe relacionada precisa estar mapeada com a anotação @Form e seus campos com a anotação @CampoForm
 
 - Relacionamentos Suportados
 
@@ -207,7 +207,7 @@ Para gerar os dados do formulário será necessário acessar o método static Cr
         ]
     }
     ```
-Como você pode observar existem alguns atributos de nosso Objeto acima que não foram definidos atrvés das anotações @Form @CampoForm ou @Image, esses atributos são definidos atraves das anotações de relacionamento do [javax.persistence](https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html), a tabela abaixo representa esses atributos:
+Como você pode observar existem alguns atributos de nosso Objeto acima que não foram definidos atrvés das anotações @Form @CampoForm ou @Image, esses atributos são definidos atraves das anotações de relacionamento ou @Column do [javax.persistence](https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html), a tabela abaixo representa esses atributos:
 
 - Atributos do Formulário que são gerados utilizando [javax.persistence](https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html)
 
