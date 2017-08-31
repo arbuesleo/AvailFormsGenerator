@@ -123,6 +123,7 @@ A anotação @Image será utilizada para identificar o campo como um campo que r
 A nossa ferramenta suporta criação de subtelas de relacionamentos de nosso objeto mapeado, para isso basta nossa classe principal estar campo o campo relacionado mapeado com uma das anotações de relacionamento do [javax.persistence](https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html), os relacionamentos suportados estão listados na tabela abaixo, e a classe relacionada precisa estar mapeada com a anotação @Form e seus campos com a anotação @CampoForm
 
 - Relacionamentos Suportados
+
     | Tipo Relacionamento(javax.persistence) | Tipo Entidade|
     | ------ |   ------ |
     | @ManyToMany | PESQUISAVEL_MUITOS|
