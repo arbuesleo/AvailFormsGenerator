@@ -24,7 +24,8 @@ Esse projeto pode ser utilizado juntamente com o projeto [AvailFormsAngular](htt
  - [Geração de dados do formulário](#gerDadosForm)
  - [Geração de dados de listagem](#gerDadosListagem)
 
-<a name="instalacao"></a> ##Instalação
+<a name="instalacao"></a> 
+## Instalação
 
 Para utilizar o AvailFormsGenerator em seu projeto java com [Maven](https://maven.apache.org/) basta adicionar as essas duas tags no seu arquivo pom.xml
 - Essa primeira é para que o Maven conheça o repositório onde está nosso projeto.
