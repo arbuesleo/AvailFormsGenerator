@@ -243,6 +243,8 @@ A geração de dados de listagem tem o objetivo de gerar dados para tela de list
 
 O objetivo desses dados de listagem é gerar a tela de listagem e pesquisa da entidade mapeada.
 
+Para ver melhor o funcionamento do framework recomendo que veja o exemplo disponível no repositório [ExemploAvailForms](https://github.com/leogomes26/AvailFormsExemplo.git)
+
 ## Licença
 ## MIT
 
