@@ -44,7 +44,7 @@ Para utilizar o AvailFormsGenerator em seu projeto java com [Maven](https://mave
 	    <dependency>
 			<groupId>com.avail</groupId>
 			<artifactId>AvailForms</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 ```
