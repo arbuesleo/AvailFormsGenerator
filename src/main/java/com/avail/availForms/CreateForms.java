@@ -18,6 +18,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import com.avail.availForms.annotation.CampoForm;
 import com.avail.availForms.annotation.Form;
 import com.avail.availForms.annotation.Image;
+import com.avail.availForms.annotation.Relacionamento;
 import com.avail.availForms.enuns.TipoCampo;
 import com.avail.availForms.enuns.TipoEntidade;
 import com.avail.availForms.pojo.CampoPojo;
@@ -177,8 +178,12 @@ public class CreateForms {
 	}
 
 	private static boolean containsAnotationsRelacionamento(Field campo) {
-		return campo.isAnnotationPresent(ManyToMany.class) | campo.isAnnotationPresent(ManyToOne.class)
-				| campo.isAnnotationPresent(OneToOne.class) | campo.isAnnotationPresent(OneToMany.class);
+		boolean ignorar = false;
+		if(campo.isAnnotationPresent(Relacionamento.class)) {
+			ignorar = campo.getAnnotation(Relacionamento.class).ignorar();
+		}
+		return (campo.isAnnotationPresent(ManyToMany.class) | campo.isAnnotationPresent(ManyToOne.class)
+				| campo.isAnnotationPresent(OneToOne.class) | campo.isAnnotationPresent(OneToMany.class)) && !ignorar;
 	}
 
 	private static TipoEntidade getTipoEntidade(Field campo) {
@@ -224,10 +229,14 @@ public class CreateForms {
 	}
 
 	private static String getEntidadeNome(Field campo) {
+		String nomeAdicional = "";
+		if(campo.isAnnotationPresent(Relacionamento.class)) {
+			nomeAdicional = campo.getAnnotation(Relacionamento.class).nomeAdicional();
+		}
 		if (campoIsList(campo)) {
-			return getTypeList(campo).getAnnotation(Form.class).nomeEntidade();
+			return getTypeList(campo).getAnnotation(Form.class).nomeEntidade() + " - " + nomeAdicional;
 		} else {
-			return campo.getType().getClass().getAnnotation(Form.class).nomeEntidade();
+			return campo.getType().getClass().getAnnotation(Form.class).nomeEntidade() + " - " + nomeAdicional;
 		}
 	}
 
