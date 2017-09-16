@@ -60,6 +60,11 @@ public class CreateForms {
 				
 			} else if (containsAnotationsRelacionamento(campo) && buscaRelacionamentos) {
 				
+				String nomeAdicional = "";
+				if(campo.isAnnotationPresent(Relacionamento.class)) {
+					nomeAdicional = campo.getAnnotation(Relacionamento.class).nomeAdicional();
+				}
+				
 				Boolean isFormInList = false;
 				Boolean buscaRelacionamentoFilhos = (getTipoEntidade(campo) == TipoEntidade.PRINCIPAL || getTipoEntidade(campo) == TipoEntidade.ADICIONAVEL_UM || getTipoEntidade(campo) == TipoEntidade.ADICIONAVEL_MUITOS);
 				if (List.class.equals(campo.getType())) {
@@ -89,7 +94,7 @@ public class CreateForms {
 						}
 					}
 					if (getTipoEntidade(campo) == TipoEntidade.PESQUISAVEL_UM) {
-						CampoPojo campoAux = new CampoPojo(campo.getType().getAnnotation(Form.class).nomeEntidade(), (campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class)),campo.getName(), null, TipoCampo.PESQUISA.name(), 0, Boolean.FALSE);
+						CampoPojo campoAux = new CampoPojo(campo.getType().getAnnotation(Form.class).nomeEntidade() + " - " + nomeAdicional, (campo.isAnnotationPresent(NotBlank.class) || campo.isAnnotationPresent(NotNull.class)),campo.getName(), null, TipoCampo.PESQUISA.name(), 0, Boolean.FALSE);
 						campoAux.setDadosListagem(getDadosListagem(campo.getType()));
 						camposAux.add(campoAux);
 
